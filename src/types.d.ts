@@ -1,5 +1,8 @@
-// type shim for nodejs' `require()` syntax
-// for stricter node.js typings, remove this and install `@types/node`
-declare const require: (module: string) => any;
-
-// add your custom typings here
+interface CreepMemory{
+    /**角色 */
+    role:string
+}
+/** 可用索引取得T */
+interface ILookup<T> {
+    [key: string]: T;
+}
