@@ -6,6 +6,11 @@ import commonjs from "rollup-plugin-commonjs";
 import typescript from "rollup-plugin-typescript2";
 import screeps from "rollup-plugin-screeps";
 
+let localOutputPath = ""
+try {
+  localOutputPath = require("./local-ouput-path");
+} catch (error) {}
+
 let cfg;
 const i = process.argv.indexOf("--dest") + 1;
 if (i == 0) {
@@ -17,7 +22,7 @@ if (i == 0) {
 export default {
   input: "src/main.ts",
   output: {
-    file: "dist/main.js",
+    file: localOutputPath ? localOutputPath : "dist/main.js",
     format: "cjs",
     sourcemap: true
   },
