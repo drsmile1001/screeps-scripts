@@ -1,8 +1,15 @@
-import { RoleRuner } from "./roleRunner";
+import { RoleRunner } from "roleRuner/roleRunner";
+import { HarvestJob } from "job/HarvestJob";
+import { IJobRunner } from "job/IJobRunner";
+
 /**採集者執行器 */
-export class Harvester implements RoleRuner{
-    Role = "harvester";
-    Run(creep:Creep){
-        console.log(`${creep.id} is ${this.Role}`);
+export class Harvester extends RoleRunner {
+    JobRunners: ILookup<IJobRunner> = {
+        harvester: new HarvestJob()
+
+    };
+    Role: string = "harvester";
+    CheckJob(creep: Creep): string {
+        throw new Error("Method not implemented.");
     }
 }

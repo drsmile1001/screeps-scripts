@@ -1,6 +1,8 @@
-interface CreepMemory{
+interface CreepMemory {
     /**角色 */
-    role:string
+    role: string,
+    /**工作 */
+    job: string,
 }
 /** 可用索引取得T */
 interface ILookup<T> {
