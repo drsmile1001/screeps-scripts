@@ -1,15 +1,18 @@
 import { IJobRunner } from "job/IJobRunner";
 
-/**採集工作 */
-export class HarvestJob implements IJobRunner {
+/**採集工作執行器 */
+class HarvestJob implements IJobRunner {
     Job: string = "harvest";
     SayWord: string = "⛏️";
     PathColor: string = "#ffaa00";
     Run(creep: Creep): void {
         var sources = creep.room.find(FIND_SOURCES);
-        if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(sources[0], { visualizePathStyle: { stroke: this.PathColor } });
+        if (creep.harvest(sources[1]) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(sources[1], { visualizePathStyle: { stroke: this.PathColor } });
         }
     }
 }
+
+/**採集工作執行器實例 */
+export const harvestJob = new HarvestJob();
 

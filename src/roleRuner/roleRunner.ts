@@ -18,7 +18,7 @@ export interface IRoleRuner {
 
 
 
-/**標準工作執行器 */
+/**標準角色執行器 */
 export abstract class RoleRunner implements IRoleRuner {
     abstract JobRunners: ILookup<IJobRunner>;
     abstract Role: string;

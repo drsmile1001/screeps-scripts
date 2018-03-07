@@ -1,13 +1,19 @@
 class Tool{
-    /**所有creep */
-    Creeps = (function(){
-        let allCreeps :Array<Creep> = [];
-        for (const name in Game.creeps) {
-            const creep = Game.creeps[name];
-            allCreeps.push(creep);
-          }
-        return allCreeps;
-    })()
+    FindMyStructureNeedEnergy(room:Room){
+        //檢查資料時間
+        let needUpdateData = room.memory.myStructureIdNeedEnergyDataTime < Game.time ||
+        room.memory.myStructureIdNeedEnergyDataTime === undefined;
+        if(needUpdateData){
+            room.memory.myStructureIdNeedEnergy = room.find(FIND_MY_STRUCTURES,{
+                filter:s => {
+                    return (s.structureType == STRUCTURE_EXTENSION ||
+                    s.structureType == STRUCTURE_SPAWN ||s.structureType == STRUCTURE_TOWER) &&
+                    s.energy < s.energyCapacity;
+                }
+            }).map(s=>s.id);
+        }
+        return room.memory.myStructureIdNeedEnergy;
+    }
 }
 
-export let tool = new Tool();
+export const tool = new Tool();

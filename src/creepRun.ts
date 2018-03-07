@@ -1,13 +1,15 @@
 import { IRoleRuner } from "roleRuner/roleRunner";
 import { Builder } from "roleRuner/builder";
 import { Harvester } from "roleRuner/harvester";
+import { Upgrader } from "roleRuner/Upgrader";
 
 /** creep執行器 */
 export class CreepRuner{
     /**註冊的執行器 */
     RoleRunners :ILookup<IRoleRuner> = {
-        //harvester: new Harvester(),
-        builder:new Builder()
+        builder:new Builder(),
+        harvester:new Harvester(),
+        upgrader:new Upgrader()
     };
     /**執行creep */
     Run(creep:Creep){

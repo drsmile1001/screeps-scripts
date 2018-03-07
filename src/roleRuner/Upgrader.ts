@@ -1,24 +1,25 @@
-import { RoleRunner } from "roleRuner/roleRunner"
-import { harvestJob } from "job/HarvestJob";
+import { RoleRunner } from "./roleRunner";
 import { IJobRunner } from "job/IJobRunner";
-import { buildJob } from "job/BuildJob";
-/**建築角色執行器 */
-export class Builder extends RoleRunner {
-    JobRunners: ILookup<IJobRunner> = {
-        build: buildJob,
-        harvest: harvestJob
+import { harvestJob } from "job/HarvestJob";
+import { upgradJob } from "job/UpgradJob";
+
+/**升級角色執行器 */
+export class Upgrader extends RoleRunner {
+    JobRunners: ILookup<IJobRunner>={
+        harvest: harvestJob,
+        upgrad:upgradJob
     };
-    Role = "builder";
+    Role: string = "upgrader";
     CheckJob(creep: Creep): string {
         switch (creep.memory.job) {
-            case "build":
+            case "upgrad":
                 if (creep.carry.energy === 0) {
                     creep.memory.job = "harvest"
                 }
                 break;
             case "harvest":
                 if (creep.carry.energy == creep.carryCapacity) {
-                    creep.memory.job = "build";
+                    creep.memory.job = "upgrad";
                 }
                 break;
             default:
@@ -28,4 +29,3 @@ export class Builder extends RoleRunner {
         return creep.memory.job;
     }
 }
-
