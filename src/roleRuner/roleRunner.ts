@@ -1,38 +1,45 @@
-import { IJobRunner } from "job/IJobRunner";
+import { allJobRunners } from "job/AllJobRunners";
+import { Job, JobRunResult } from "job/JobRunner";
+import { JobTransitionTable } from "job/JobTransitionTable";
 
-/** 角色執行器 */
-export interface IRoleRuner {
-    /**註冊的執行器 */
-    JobRunners: ILookup<IJobRunner>,
-    /**執行器的角色 */
-    Role: string,
-    /** 命令creep */
-    Run(creep: Creep): void,
-    /**
-     * 檢查並設定creep的工作
-     * @param creep 檢查的creep
-     * @returns {string} creep的工作
-     */
-    CheckJob(creep: Creep): string,
+export enum Role {
+    Builder = "builder",
+    Harvester = "harvester",
+    Upgrader = "upgrader"
 }
 
-
-
-/**標準角色執行器 */
-export abstract class RoleRunner implements IRoleRuner {
-    abstract JobRunners: ILookup<IJobRunner>;
-    abstract Role: string;
+/**
+ * 角色執行器
+ */
+export abstract class RoleRunner {
     /**
-     * 檢查並設定creep的工作
-     * @param creep 檢查的creep
-     * @returns {string} creep的工作
+     * 執行器的角色
      */
-    abstract CheckJob(creep: Creep): string;
-    /**註冊的執行器 */
+    abstract Role: Role;
+    /**
+     * 工作轉譯表
+     */
+    abstract JobTransitionTable: JobTransitionTable;
+
+    abstract DefaultJob: Job;
+    /**
+     *  命令creep
+     */
     Run(creep: Creep): void {
-        let jobState = this.CheckJob(creep);
-        let jobRunner = this.JobRunners[jobState];
-        creep.say(jobRunner.SayWord);
-        jobRunner.Run(creep);
+        if (creep.spawning)
+            return;
+        // TODO: 改用warpper?
+        const job = (creep.memory.job || this.DefaultJob) as Job;
+        const jobRunner = allJobRunners[job];
+        const runResult = jobRunner.Run(creep);
+        const nextJob = this.JobTransitionTable.GetNextJob(job, runResult);
+        if (!nextJob) {
+            console.log(`creep ${creep.id} 職業:${this.Role} 進行工作:${job} 工作結果${runResult} 查無適合的下個工作，將繼續進行${job}`);
+            return;
+        }
+        creep.memory.job = nextJob;
+        if (runResult !== JobRunResult.OK) {
+            this.Run(creep);
+        }
     }
 }

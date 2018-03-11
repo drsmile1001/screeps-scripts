@@ -1,31 +1,16 @@
-import { RoleRunner } from "./roleRunner";
-import { IJobRunner } from "job/IJobRunner";
-import { harvestJob } from "job/HarvestJob";
-import { upgradJob } from "job/UpgradJob";
+import { Job, JobRunResult } from "job/JobRunner";
+import { JobTransition } from "job/JobTransition";
+import { JobTransitionTable } from "job/JobTransitionTable";
+import { Role, RoleRunner } from "roleRuner/roleRunner";
 
-/**升級角色執行器 */
+/**
+ * 升級角色執行器
+ */
 export class Upgrader extends RoleRunner {
-    JobRunners: ILookup<IJobRunner>={
-        harvest: harvestJob,
-        upgrad:upgradJob
-    };
-    Role: string = "upgrader";
-    CheckJob(creep: Creep): string {
-        switch (creep.memory.job) {
-            case "upgrad":
-                if (creep.carry.energy === 0) {
-                    creep.memory.job = "harvest"
-                }
-                break;
-            case "harvest":
-                if (creep.carry.energy == creep.carryCapacity) {
-                    creep.memory.job = "upgrad";
-                }
-                break;
-            default:
-                creep.memory.job = "harvest"
-                break;
-        }
-        return creep.memory.job;
-    }
+    JobTransitionTable: JobTransitionTable = new JobTransitionTable([
+        new JobTransition(Job.Harvest, JobRunResult.CarryEnergyFull, Job.Upgrad),
+        new JobTransition(Job.Upgrad, JobRunResult.OutOfEnergy, Job.Harvest)
+    ]);
+    DefaultJob: Job = Job.Harvest;
+    Role = Role.Upgrader;
 }
