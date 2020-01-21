@@ -1,16 +1,22 @@
-// example declaration file - remove these and add your own custom typings
-
-// memory extension samples
 interface CreepMemory {
-  role: string;
-  room: string;
-  working: boolean;
+  /**角色 */
+  role: string,
+  /**工作 */
+  job: string,
+  /**目標ID */
+  targetId: string | null,
+}
+/** 可用索引取得T */
+interface ILookup<T> {
+  [key: string]: T;
+}
+interface RoomMemory {
+  /**這個房間中需要補充能源的我方建築物ID的資料的更新時間 */
+  myStructureIdNeedEnergyDataTime: number,
+  /**這個房間中需要補充能源的我方建築物ID */
+  myStructureIdNeedEnergy: Array<string>
 }
 
-interface Memory {
-  uuid: number;
-  log: any;
-}
 
 // `global` extension samples
 declare namespace NodeJS {

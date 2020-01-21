@@ -6,11 +6,6 @@ import commonjs from "rollup-plugin-commonjs";
 import typescript from "rollup-plugin-typescript2";
 import screeps from "rollup-plugin-screeps";
 
-let localOutputPath = ""
-try {
-  localOutputPath = require("./local-ouput-path");
-} catch (error) {}
-
 let cfg;
 const dest = process.env.DEST;
 if (!dest) {
@@ -22,7 +17,7 @@ if (!dest) {
 export default {
   input: "src/main.ts",
   output: {
-    file: localOutputPath ? localOutputPath : "dist/main.js",
+    file: "dist/main.js",
     format: "cjs",
     sourcemap: true
   },
@@ -31,7 +26,7 @@ export default {
     clear({ targets: ["dist"] }),
     resolve(),
     commonjs(),
-    typescript({tsconfig: "./tsconfig.json"}),
-    screeps({config: cfg, dryRun: cfg == null})
+    typescript({ tsconfig: "./tsconfig.json" }),
+    screeps({ config: cfg, dryRun: cfg == null })
   ]
 }
