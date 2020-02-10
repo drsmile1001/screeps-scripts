@@ -16,14 +16,14 @@ function runSpawn(spawn: StructureSpawn) {
     if (spawn.spawning !== null) return
     const allCreepRoles = _.map(Game.creeps, creep => creep.memory.role)
     const creepCount = allCreepRoles.length
-    if (creepCount > 9) return
+    if (creepCount > 12) return
 
     const roleCountDic = _.mapValues(
         _.groupBy(allCreepRoles, x => x),
         roleArray => roleArray.length
     )
 
-    if (creepCount == 0 || roleCountDic[Role.Harvester] * 3 <= roleCountDic[Role.Upgrader]) {
+    if (creepCount == 0 || roleCountDic[Role.Harvester] * 6 <= roleCountDic[Role.Upgrader]) {
         tryToSpawn(
             spawn,
             {

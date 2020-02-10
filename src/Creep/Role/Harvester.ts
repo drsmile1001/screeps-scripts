@@ -20,10 +20,13 @@ export class Harvester implements IRoleRuner {
     getJob(creep: Creep): Job {
         switch (creep.memory.job) {
             case Job.harvest:
-                if (creep.carry.energy == creep.carryCapacity) return Job.transferEnergy
+                if (!creep.store.getFreeCapacity(RESOURCE_ENERGY)) {
+                    delete creep.memory.harvestSourceId
+                    return Job.transferEnergy
+                }
                 break
             case Job.transferEnergy:
-                if (creep.carry.energy === 0) return Job.harvest
+                if (!creep.store.getUsedCapacity(RESOURCE_ENERGY)) return Job.harvest
                 break
             default:
                 return Job.harvest
@@ -32,23 +35,39 @@ export class Harvester implements IRoleRuner {
     }
 
     harvest(creep: Creep) {
-        const sourcesData = creep.room.memory.sources
-        if (!sourcesData || !sourcesData.length) {
-            creep.say("❓")
-            logger.warn(`creep${creep.name} 在 room${creep.room.name} 找不到可用的source`)
-            return
+        if (!creep.memory.harvestSourceId) {
+            const sources = creep.room.memory.sources
+            const sourceCreeps: ILookup<number> = {};
+
+            _.map(Game.creeps, creep => creep.memory)
+                .forEach(cm => {
+                    if (cm.harvestSourceId) {
+                        sourceCreeps[cm.harvestSourceId] = (sourceCreeps[cm.harvestSourceId] || 0) + 1
+                    }
+                })
+
+            for (const sourceId in sources) {
+                const source = sources[sourceId]
+                if ((sourceCreeps[sourceId] || 0) < source.creepLimit) {
+                    creep.memory.harvestSourceId = sourceId
+                }
+            }
+            if (!creep.memory.harvestSourceId) {
+                creep.say("❓")
+                logger.warn(`creep${creep.name} 在 room${creep.room.name} 找不到可用的source`)
+                return
+            }
         }
-        const sourceData = sourcesData[0]
-        const source = Game.getObjectById<Source>(sourceData.id)
+        const sourceId = creep.memory.harvestSourceId
+        const source = Game.getObjectById<Source>(sourceId)
         if (!source) {
-            creep.say("❓")
-            logger.warn(`room${creep.room.name} 記錄的 source${sourceData.id} 不正確`)
+            creep.say("❌")
+            logger.error(`room${creep.room.name} 記錄的 source${sourceId} 不正確`)
             return
         }
         creep.say("⛏️")
-        if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
+        if (creep.harvest(source) === ERR_NOT_IN_RANGE)
             creep.moveTo(source, { visualizePathStyle: { stroke: "#ffaa00" } })
-        }
     }
 
     transferEnergy(creep: Creep) {

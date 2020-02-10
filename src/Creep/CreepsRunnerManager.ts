@@ -24,6 +24,7 @@ export function runAllCreeps() {
     for (const name in Game.creeps) {
         try {
             const creep = Game.creeps[name]
+            if (creep.spawning) continue
             runCreep(creep)
         } catch (error) {
             logger.error(error)
