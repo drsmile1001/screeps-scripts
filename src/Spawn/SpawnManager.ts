@@ -4,6 +4,18 @@ type bodyParts = {
     [index in BodyPartConstant]?: number
 }
 
+/**creep  */
+const bodyPartCost = {
+    [MOVE]: 50,
+    [WORK]: 100,
+    [CARRY]: 50,
+    [ATTACK]: 80,
+    [RANGED_ATTACK]: 150,
+    [HEAL]: 250,
+    [CLAIM]: 600,
+    [TOUGH]: 10
+}
+
 /**執行所有spawn */
 export function runAllSpawners() {
     for (const name in Game.spawns) {
@@ -18,17 +30,23 @@ function runSpawn(spawn: StructureSpawn) {
     const creepCount = allCreepRoles.length
     if (creepCount > 12) return
 
+    const energyLimit = spawn.room.energyCapacityAvailable
+
     const roleCountDic = _.mapValues(
         _.groupBy(allCreepRoles, x => x),
         roleArray => roleArray.length
     )
 
-    if (creepCount == 0 || roleCountDic[Role.Harvester] * 6 <= roleCountDic[Role.Upgrader]) {
+    if (creepCount == 0 || (roleCountDic[Role.Harvester] || 0) * 4 <= (roleCountDic[Role.Upgrader] || 0)) {
+        const baseEnergy = bodyPartCost.work + bodyPartCost.move + bodyPartCost.carry * 2
+        const extraEnergy = energyLimit - baseEnergy
+        const extraPartEnergy = bodyPartCost.work + bodyPartCost.move
+        const extraPartCounts = Math.max(Math.floor(extraEnergy / extraPartEnergy), 0)
         tryToSpawn(
             spawn,
             {
-                work: 1,
-                move: 1,
+                work: 1 + extraPartCounts,
+                move: 2 + extraPartCounts,
                 carry: 1
             },
             {
@@ -36,11 +54,15 @@ function runSpawn(spawn: StructureSpawn) {
             }
         )
     } else {
+        const baseEnergy = bodyPartCost.work + bodyPartCost.move + bodyPartCost.carry * 2
+        const extraEnergy = energyLimit - baseEnergy
+        const extraPartEnergy = bodyPartCost.work + bodyPartCost.move
+        const extraPartCounts = Math.max(Math.floor(extraEnergy / extraPartEnergy), 0)
         tryToSpawn(
             spawn,
             {
-                work: 1,
-                move: 1,
+                work: 1 + extraPartCounts,
+                move: 2 + extraPartCounts,
                 carry: 1
             },
             {

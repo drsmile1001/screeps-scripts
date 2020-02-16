@@ -4,6 +4,7 @@ interface CreepMemory {
     job?: string
     transferEnergyTargetId?: string
     harvestSourceId?: string
+    buildTargetId?: string
 }
 /** 可用索引取得T */
 interface ILookup<T> {
@@ -16,3 +17,15 @@ interface RoomMemory {
 interface SourceMemory {
     creepLimit: number
 }
+// interface StoreEnergy {
+//     store: Store<RESOURCE_ENERGY, false>;
+// }
+// interface StructureTower extends StoreEnergy {
+
+// }
+// interface StructureExtension extends StoreEnergy {
+
+// }
+// interface StructureSpawn extends StoreEnergy {
+
+// }
