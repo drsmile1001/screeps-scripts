@@ -30,14 +30,15 @@ function runSpawn(spawn: StructureSpawn) {
     const creepCount = allCreepRoles.length
     if (creepCount > 12) return
 
-    const energyLimit = spawn.room.energyCapacityAvailable
+    //const energyLimit = spawn.room.energyCapacityAvailable
+    const energyLimit = spawn.room.energyAvailable + (spawn.room.energyCapacityAvailable - spawn.room.energyAvailable) * (creepCount / 12)
 
     const roleCountDic = _.mapValues(
         _.groupBy(allCreepRoles, x => x),
         roleArray => roleArray.length
     )
 
-    if (creepCount == 0 || (roleCountDic[Role.Harvester] || 0) * 4 <= (roleCountDic[Role.Upgrader] || 0)) {
+    if (creepCount == 0 || (roleCountDic[Role.Harvester] || 0) * 2 <= (roleCountDic[Role.Upgrader] || 0)) {
         const baseEnergy = bodyPartCost.work + bodyPartCost.move + bodyPartCost.carry * 2
         const extraEnergy = energyLimit - baseEnergy
         const extraPartEnergy = bodyPartCost.work + bodyPartCost.move
