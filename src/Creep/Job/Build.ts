@@ -16,25 +16,22 @@ export function build(creep: Creep, once: boolean = false): BuildResult {
     if (!creep.store.getUsedCapacity(RESOURCE_ENERGY)) return BuildResult.NoEnergy
     while (true) {
         if (creep.memory.buildTargetId) {
-            let constructionSite = Game.getObjectById<ConstructionSite>(creep.memory.buildTargetId)
+            const constructionSite = Game.getObjectById<ConstructionSite>(creep.memory.buildTargetId)
             if (!constructionSite) {
                 delete creep.memory.buildTargetId
-                if (once) continue
-                else return BuildResult.Done
-            }
-            else {
+                if (once) return BuildResult.Done
+                else continue
+            } else {
                 buildConstructionSite(creep, constructionSite)
                 return BuildResult.Ok
             }
-        }
-        else {
+        } else {
             const targets = creep.room.find(FIND_MY_CONSTRUCTION_SITES)
             if (targets.length) {
                 creep.memory.buildTargetId = targets[0].id
                 buildConstructionSite(creep, targets[0])
                 return BuildResult.Ok
-            }
-            else return BuildResult.NoTarget
+            } else return BuildResult.NoTarget
         }
     }
 }

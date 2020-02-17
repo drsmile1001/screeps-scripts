@@ -5,6 +5,7 @@ interface CreepMemory {
     transferEnergyTargetId?: string
     harvestSourceId?: string
     buildTargetId?: string
+    repairTargetId?: string
 }
 /** 可用索引取得T */
 interface ILookup<T> {

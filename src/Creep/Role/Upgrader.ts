@@ -1,8 +1,8 @@
 import { IRoleRuner } from "./IRoleRuner"
 import { Role } from "Creep/Role"
-import { harvest, HarvestResult } from "Creep/Job/Harvest";
-import { logger } from "utils/Logger";
-import { upgradeController, UpgradeControllerResult } from "Creep/Job/UpgradeController";
+import { harvest, HarvestResult } from "Creep/Job/Harvest"
+import { logger } from "utils/Logger"
+import { upgradeController, UpgradeControllerResult } from "Creep/Job/UpgradeController"
 
 enum Job {
     harvest = "harvest",
@@ -25,7 +25,7 @@ export class Upgrader implements IRoleRuner {
                             creep.memory.job = Job.upgradeController
                             continue
                         case HarvestResult.NoSource:
-                            creep.say("💤")
+                            creep.say("💤for source")
                             return
                         default:
                             logger.error(`未知HarvestResult ${harvestResult}`)
@@ -48,6 +48,6 @@ export class Upgrader implements IRoleRuner {
                     creep.memory.job = Job.upgradeController
                     continue
             }
-        } while (true);
+        } while (true)
     }
 }

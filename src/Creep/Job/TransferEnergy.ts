@@ -17,24 +17,23 @@ export function transferEnergyToMyStructures(creep: Creep): TransferEnergyResult
     if (!creep.store.getUsedCapacity(RESOURCE_ENERGY)) return TransferEnergyResult.NoEnergy
     while (true) {
         if (creep.memory.transferEnergyTargetId) {
-            let targetStructure = Game.getObjectById<StructureSpawn | StructureTower | StructureExtension>(creep.memory.transferEnergyTargetId)
+            const targetStructure = Game.getObjectById<StructureSpawn | StructureTower | StructureExtension>(
+                creep.memory.transferEnergyTargetId
+            )
             if (!targetStructure || !targetStructure.store.getFreeCapacity(RESOURCE_ENERGY)) {
                 delete creep.memory.transferEnergyTargetId
                 continue
-            }
-            else {
+            } else {
                 transferEnergy(creep, targetStructure)
                 return TransferEnergyResult.Ok
             }
-        }
-        else {
+        } else {
             const structures = findMyStructureNeedEnergy(creep.room)
             if (structures.length) {
                 creep.memory.transferEnergyTargetId = structures[0].id
                 transferEnergy(creep, structures[0])
                 return TransferEnergyResult.Ok
-            }
-            else return TransferEnergyResult.NoTarget
+            } else return TransferEnergyResult.NoTarget
         }
     }
 }
