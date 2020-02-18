@@ -29,7 +29,7 @@ export class Harvester implements IRoleRuner {
                             creep.memory.job = Job.TransferEnergy
                             continue
                         case HarvestResult.NoSource:
-                            creep.say("💤for source")
+                            creep.say("💤")
                             return
                         default:
                             logger.error(`未知HarvestResult ${harvestResult}`)
@@ -47,7 +47,7 @@ export class Harvester implements IRoleRuner {
                             continue
                         case TransferEnergyResult.NoTarget:
                             //沒有能源轉移對象，改去維修
-                            creep.memory.job = Job.Repair
+                            creep.memory.job = Job.Build
                             continue
                         default:
                             logger.error(`未知TransferEnergyResult ${transferEnergyToMyStructuresResult}`)
@@ -67,9 +67,9 @@ export class Harvester implements IRoleRuner {
                             creep.memory.job = Job.TransferEnergy
                             continue
                         case RepairResult.NoTarget:
-                            //沒有維修對象，改去建造
-                            creep.memory.job = Job.Build
-                            continue
+                            creep.say("💤")
+                            creep.memory.job = Job.TransferEnergy
+                            return
                         default:
                             logger.error(`未知RepairResult ${repairResult}`)
                             return
@@ -84,13 +84,11 @@ export class Harvester implements IRoleRuner {
                             creep.memory.job = Job.Harvest
                             continue
                         case BuildResult.Done:
-                            //建築一次後，改去傳送能源
                             creep.memory.job = Job.TransferEnergy
                             continue
                         case BuildResult.NoTarget:
-                            creep.say("💤 沒有可用工作")
-                            creep.memory.job = Job.TransferEnergy
-                            return
+                            creep.memory.job = Job.Repair
+                            continue
                         default:
                             logger.error(`未知BuildResult ${buildResult}`)
                             return

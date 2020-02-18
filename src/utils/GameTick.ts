@@ -1,8 +1,8 @@
-export function atLoop(loop: number): boolean {
-    return Game.time % loop === 0
+export function atLoop(loop: number, shift: number = 0): boolean {
+    return (Game.time - shift) % loop === 0
 }
 
-export function runAtLoop(loop: number, action: () => void) {
-    if (!atLoop(loop)) return
+export function runAtLoop(loop: number, action: () => void, shift: number = 0) {
+    if (!atLoop(loop, shift)) return
     action()
 }

@@ -1,3 +1,5 @@
+import { runAtLoop } from "utils/GameTick"
+
 export enum BuildResult {
     Ok,
     NoEnergy,
@@ -6,9 +8,18 @@ export enum BuildResult {
 }
 
 function buildConstructionSite(creep: Creep, target: ConstructionSite) {
-    creep.say("🚧")
-    if (creep.build(target) == ERR_NOT_IN_RANGE) {
-        creep.moveTo(target, { visualizePathStyle: { stroke: "#ddffdd" } })
+    const result = creep.build(target)
+    switch (result) {
+        case ERR_NOT_IN_RANGE:
+            runAtLoop(3, () => creep.say("🚧"), creep.ticksToLive)
+            creep.moveTo(target, { visualizePathStyle: { stroke: "#ddffdd" } })
+            return
+        case OK:
+            return
+        default:
+            creep.say("❌")
+            console.log(`${creep.name} 在buildConstructionSite時錯誤 ${result}`)
+            return
     }
 }
 

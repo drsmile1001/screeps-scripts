@@ -13,6 +13,11 @@ export class RoomGuard implements IRoleRuner {
             if (creep.attack(target) === ERR_NOT_IN_RANGE) {
                 creep.moveTo(target)
             }
+        } else {
+            const ramparts = creep.room.find(FIND_MY_STRUCTURES, {
+                filter: s => s.structureType === STRUCTURE_RAMPART
+            })
+            if (ramparts.length) creep.moveTo(ramparts[0])
         }
     }
 }

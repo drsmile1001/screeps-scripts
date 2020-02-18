@@ -1,4 +1,5 @@
 import { findMyStructureNeedEnergy } from "Room/RoomService"
+import { runAtLoop } from "utils/GameTick"
 
 export enum TransferEnergyResult {
     Ok,
@@ -7,9 +8,18 @@ export enum TransferEnergyResult {
 }
 
 function transferEnergy(creep: Creep, target: AnyCreep | Structure) {
-    creep.say("🔋")
-    if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(target, { visualizePathStyle: { stroke: "#ffffff" } })
+    const result = creep.transfer(target, RESOURCE_ENERGY)
+    switch (result) {
+        case ERR_NOT_IN_RANGE:
+            runAtLoop(3, () => creep.say("🔋"), creep.ticksToLive)
+            creep.moveTo(target, { visualizePathStyle: { stroke: "#ffffff" } })
+            return
+        case OK:
+            return
+        default:
+            creep.say("❌")
+            console.log(`${creep.name} transferEnergy時錯誤 ${result}`)
+            return
     }
 }
 

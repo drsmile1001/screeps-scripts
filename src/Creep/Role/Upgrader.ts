@@ -25,7 +25,7 @@ export class Upgrader implements IRoleRuner {
                             creep.memory.job = Job.upgradeController
                             continue
                         case HarvestResult.NoSource:
-                            creep.say("💤for source")
+                            creep.say("💤")
                             return
                         default:
                             logger.error(`未知HarvestResult ${harvestResult}`)
@@ -40,6 +40,9 @@ export class Upgrader implements IRoleRuner {
                             //缺乏能源轉移到採集任務
                             creep.memory.job = Job.harvest
                             continue
+                        case UpgradeControllerResult.NoTarget:
+                            logger.error(`creep${creep.name} 無有效目標`)
+                            return
                         default:
                             logger.error(`未知UpgradeControllerResult ${upgradeControllerResult}`)
                             return
