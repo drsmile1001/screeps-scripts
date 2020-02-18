@@ -3,10 +3,11 @@ import { Harvester } from "Creep/Role/Harvester"
 import { logger } from "utils/Logger"
 import { Upgrader } from "./Role/Upgrader"
 import { Role } from "Creep/Role"
+import { RoomGuard } from "./Role/RoomGuard"
 
 /**註冊的執行器 */
 const roleRunnerMap = new Map<Role, IRoleRuner>()
-const roleRunners: IRoleRuner[] = [new Harvester(), new Upgrader()]
+const roleRunners: IRoleRuner[] = [new Harvester(), new Upgrader(), new RoomGuard()]
 roleRunners.forEach(roleRunner => {
     roleRunnerMap.set(roleRunner.role, roleRunner)
 })

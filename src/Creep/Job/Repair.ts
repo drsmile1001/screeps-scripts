@@ -40,7 +40,6 @@ export function repair(creep: Creep, once: boolean = false): RepairResult {
             const structures = creep.room.find(FIND_STRUCTURES, {
                 filter: structure => structureNeedRepair(structure)
             })
-            logger.log(JSON.stringify(structures.map(x => x.id)))
             if (structures.length) {
                 creep.memory.repairTargetId = structures[0].id
                 repairStructure(creep, structures[0])

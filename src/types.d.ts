@@ -1,4 +1,5 @@
 interface CreepMemory {
+    homeRoom: string
     /**角色 */
     role: import("Creep/Role").Role
     job?: string
@@ -14,19 +15,24 @@ interface ILookup<T> {
 interface RoomMemory {
     /**房間的source id集合 */
     sources: ILookup<SourceMemory>
+    hostileCreeps: ILookup<HostileCreepMemory>
+    creepNumber: number
 }
 interface SourceMemory {
     creepLimit: number
 }
-// interface StoreEnergy {
-//     store: Store<RESOURCE_ENERGY, false>;
-// }
-// interface StructureTower extends StoreEnergy {
+interface HostileCreepMemory {
+    body: BodyPartDefinition[]
+    hits: number
+    hitsMax: number
+    x: number
+    y: number
+}
 
-// }
-// interface StructureExtension extends StoreEnergy {
-
-// }
-// interface StructureSpawn extends StoreEnergy {
-
-// }
+declare namespace NodeJS {
+    interface Global {
+        removeFlags: any
+        testPath: any
+        test: any
+    }
+}

@@ -4,7 +4,7 @@ import { logger } from "utils/Logger"
 import { updateMemory, cleanMemory } from "Memory/MemoryManager"
 import { runAllSpawners } from "Spawn/SpawnManager"
 import "ConsoleCommand"
-logger.log("---程式碼更新---")
+logger.log(`---程式碼更新 時間${Game.time}---`)
 
 updateMemory()
 export const loop = ErrorMapper.wrapLoop(() => {
