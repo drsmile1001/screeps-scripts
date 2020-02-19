@@ -1,6 +1,7 @@
 import { Role } from "Creep/Role"
 import { getHostileRoomObject } from "Room/RoomService"
 import { Cache } from "utils/Cache"
+import { LazyMap } from "utils/LazyMap"
 
 /**creep  */
 const bodyPartCost = {
@@ -67,15 +68,12 @@ class RoomCreepStatus {
     }
 }
 
-const allRoomStatus: ILookup<Cache<RoomCreepStatus>> = {}
-
-function getRoomStatus(room: Room): RoomCreepStatus {
-    if (allRoomStatus[room.name]) return allRoomStatus[room.name].value
-    allRoomStatus[room.name] = new Cache(() => {
-        return new RoomCreepStatus(room)
-    })
-    return allRoomStatus[room.name].value
-}
+const roomStatus = new LazyMap<string, Cache<RoomCreepStatus>>(
+    name =>
+        new Cache(() => {
+            return new RoomCreepStatus(Game.rooms[name])
+        })
+)
 
 function gerRoomCreepLimit(room: Room): number {
     return 9
@@ -83,7 +81,7 @@ function gerRoomCreepLimit(room: Room): number {
 
 function runSpawn(spawn: StructureSpawn) {
     if (spawn.spawning !== null) return
-    const status = getRoomStatus(spawn.room)
+    const status = roomStatus.get(spawn.room.name).value
     const roomLimit = gerRoomCreepLimit(spawn.room)
 
     const energyLimit =

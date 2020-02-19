@@ -1,6 +1,7 @@
-import { logger } from "utils/Logger"
-import { runAtLoop, atLoop } from "utils/GameTick"
+import { runAtLoop } from "utils/GameTick"
 import { Cache } from "utils/Cache"
+import { Lazy } from "utils/Lazy"
+import { LazyMap } from "utils/LazyMap"
 
 export enum RepairResult {
     Ok,
@@ -25,35 +26,44 @@ function repairStructure(creep: Creep, target: Structure) {
     }
 }
 
-let roomWeekestWall: ILookup<Cache<number>> = {}
-
-function getRoomWeekestWall(room: Room): number {
-    if (roomWeekestWall[room.name]) return roomWeekestWall[room.name].value
-    roomWeekestWall[room.name] = new Cache(() => {
-        return room
-            .find(FIND_STRUCTURES, {
-                filter: s => s.structureType === STRUCTURE_WALL
+class PassiveDefenseStatus {
+    defenseStructures: Lazy<Array<StructureWall | StructureRampart>>
+    walls: Lazy<StructureWall[]>
+    wallLevel: Lazy<number>
+    ramparts: Lazy<StructureRampart[]>
+    rampartLevel: Lazy<number>
+    constructor(roomName: string) {
+        const room = Game.rooms[roomName]
+        this.defenseStructures = new Lazy(() =>
+            room.find<StructureWall | StructureRampart>(FIND_STRUCTURES, {
+                filter: s => s.structureType === STRUCTURE_WALL || (s.structureType === STRUCTURE_RAMPART && s.my)
             })
-            .map(wall => wall.hits)
-            .reduce((min, next) => Math.min(min, next), Number.MAX_VALUE)
-    })
-    return roomWeekestWall[room.name].value
+        )
+        this.walls = new Lazy(
+            () => <StructureWall[]>this.defenseStructures.value.filter(s => s.structureType === STRUCTURE_WALL)
+        )
+
+        this.wallLevel = new Lazy(() =>
+            this.walls.value
+                .map(wall => wall.hits)
+                .reduce((previous, current) => Math.min(previous, current), Number.MAX_VALUE)
+        )
+
+        this.ramparts = new Lazy(
+            () => <StructureRampart[]>this.defenseStructures.value.filter(s => s.structureType === STRUCTURE_RAMPART)
+        )
+
+        this.rampartLevel = new Lazy(() =>
+            this.ramparts.value
+                .map(wall => wall.hits)
+                .reduce((previous, current) => Math.min(previous, current), Number.MAX_VALUE)
+        )
+    }
 }
 
-let roomWeekestRampart: ILookup<Cache<number>> = {}
-
-function getRoomWeekestRampart(room: Room): number {
-    if (roomWeekestRampart[room.name]) return roomWeekestRampart[room.name].value
-    roomWeekestRampart[room.name] = new Cache(() => {
-        return room
-            .find(FIND_MY_STRUCTURES, {
-                filter: s => s.structureType === STRUCTURE_RAMPART
-            })
-            .map(wall => wall.hits)
-            .reduce((min, next) => Math.min(min, next), Number.MAX_VALUE)
-    })
-    return roomWeekestRampart[room.name].value
-}
+const passiveDefenseStatuses = new LazyMap<string, Cache<PassiveDefenseStatus>>(
+    roomName => new Cache(() => new PassiveDefenseStatus(roomName))
+)
 
 function structureNeedRepair(structure: AnyStructure): boolean {
     if (
@@ -64,9 +74,10 @@ function structureNeedRepair(structure: AnyStructure): boolean {
         return false
     if (structure.structureType === STRUCTURE_CONTROLLER) return false
     if (structure.structureType === STRUCTURE_ROAD) return true
+    const status = passiveDefenseStatuses.get(structure.room.name).value
 
-    const wallLevel = getRoomWeekestWall(structure.room) + 5000
-    const rampartLevel = getRoomWeekestRampart(structure.room)
+    const wallLevel = status.wallLevel.value + 5000
+    const rampartLevel = status.rampartLevel.value
     const repairWallThenRampart = wallLevel < rampartLevel * 30
     if (structure.structureType === STRUCTURE_WALL) return structure.hits < wallLevel && repairWallThenRampart
     if (structure.structureType === STRUCTURE_RAMPART) return structure.hits < rampartLevel && !repairWallThenRampart
