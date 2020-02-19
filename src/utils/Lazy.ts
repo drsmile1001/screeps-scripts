@@ -1,3 +1,4 @@
+/**延遲建立資料 */
 export class Lazy<TValue> {
     private _valueBuilder: () => TValue
     private _value?: TValue

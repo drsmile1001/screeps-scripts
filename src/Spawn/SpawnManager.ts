@@ -1,5 +1,5 @@
 import { Role } from "Creep/Role"
-import { getHostileRoomObject } from "Room/RoomService"
+import { hostileRoomObjects } from "Room/RoomService"
 import { Cache } from "utils/Cache"
 import { LazyMap } from "utils/LazyMap"
 
@@ -83,12 +83,12 @@ function runSpawn(spawn: StructureSpawn) {
     if (spawn.spawning !== null) return
     const status = roomStatus.get(spawn.room.name).value
     const roomLimit = gerRoomCreepLimit(spawn.room)
-
+    const hasHostile = hostileRoomObjects.get(spawn.room.name).value.length > 0
     const energyLimit =
         spawn.room.energyAvailable +
         (spawn.room.energyCapacityAvailable - spawn.room.energyAvailable) * (status.creeps / roomLimit)
     if (
-        (getHostileRoomObject(spawn.room).length && status.roles(Role.RoomGuard) < 5) ||
+        (hasHostile && status.roles(Role.RoomGuard) < 5) ||
         (status.creeps > 6 && status.roles(Role.RoomGuard) < 3)
     ) {
         const bodyParts = buildBodyParts(energyLimit, [ATTACK, MOVE, MOVE, TOUGH], [[ATTACK, MOVE, MOVE, TOUGH]])

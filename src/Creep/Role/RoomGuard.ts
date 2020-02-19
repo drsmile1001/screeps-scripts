@@ -1,12 +1,12 @@
 import { IRoleRuner } from "./IRoleRuner"
 import { Role } from "Creep/Role"
-import { getHostileRoomObject } from "Room/RoomService"
+import { hostileRoomObjects } from "Room/RoomService"
 
 /**房間守衛角色執行器 */
 export class RoomGuard implements IRoleRuner {
     role = Role.RoomGuard
     run(creep: Creep) {
-        const targets = getHostileRoomObject(creep.room)
+        const targets = hostileRoomObjects.get(creep.room.name).value
         if (targets.length) {
             const target = creep.pos.findClosestByRange(targets)!
             creep.say("🔪")

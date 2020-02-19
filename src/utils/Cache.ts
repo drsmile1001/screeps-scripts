@@ -1,3 +1,4 @@
+/**快取資料 */
 export class Cache<TValue> {
     constructor(valueFunc: () => TValue) {
         this._valueFunc = valueFunc

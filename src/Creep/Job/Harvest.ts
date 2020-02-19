@@ -1,4 +1,5 @@
 import { runAtLoop } from "utils/GameTick"
+import { CreepRegisterMap } from "utils/RegisterMap"
 
 export enum HarvestResult {
     Ok,
@@ -34,19 +35,15 @@ export function harvest(creep: Creep): HarvestResult {
                 return HarvestResult.Ok
             }
         } else {
-            const sourceCreeps: ILookup<number> = {}
-            _.map(Game.creeps, creep => creep.memory).forEach(cm => {
-                if (cm.harvestSourceId) {
-                    sourceCreeps[cm.harvestSourceId] = (sourceCreeps[cm.harvestSourceId] || 0) + 1
-                }
-            })
+
+            const sourceCreeps = new CreepRegisterMap(memory => memory.harvestSourceId)
 
             const sourceData = _.map(creep.room.memory.sources, (sourceMemory, sourceId) => ({
                 creepLimit: sourceMemory.creepLimit,
                 sourceId: sourceId!
             })).find(
                 source =>
-                    (sourceCreeps[source.sourceId] || 0) < source.creepLimit &&
+                    sourceCreeps.get(source.sourceId).length < source.creepLimit &&
                     (Game.getObjectById<Source>(source.sourceId)?.energy ?? 0) > 0
             )
             if (sourceData) {

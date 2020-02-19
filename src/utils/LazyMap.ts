@@ -1,3 +1,4 @@
+/**延遲建立被查詢對象的map */
 export class LazyMap<TKey, TValue> {
     private _valueBuilder: (key: TKey) => TValue
     private _map: Map<TKey, TValue>
