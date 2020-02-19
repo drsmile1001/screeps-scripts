@@ -1,4 +1,4 @@
-global.removeFlags = function (room: string) {
+global.removeFlags = function(room: string) {
     if (!room) {
         room = "W5N8"
         // console.log("需要房間名稱")
@@ -10,7 +10,7 @@ global.removeFlags = function (room: string) {
     })
 }
 
-global.testPath = function () {
+global.testPath = function() {
     const spawn = Game.spawns["Spawn1"]
     const sources = Game.rooms["W5N8"].find(FIND_SOURCES)
     sources.forEach(source => {

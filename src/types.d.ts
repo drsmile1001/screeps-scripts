@@ -13,14 +13,10 @@ interface ILookup<T> {
     [key: string]: T
 }
 interface RoomMemory {
-    /**房間的source id集合 */
-    sources: ILookup<SourceMemory>
     hostileCreeps: ILookup<HostileCreepMemory>
     creepNumber: number
 }
-interface SourceMemory {
-    creepLimit: number
-}
+
 interface HostileCreepMemory {
     body: BodyPartDefinition[]
     hits: number

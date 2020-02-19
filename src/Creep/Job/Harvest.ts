@@ -1,5 +1,6 @@
 import { runAtLoop } from "utils/GameTick"
 import { CreepRegisterMap } from "utils/RegisterMap"
+import { sourceEdgeMaps } from "Room/RoomService"
 
 export enum HarvestResult {
     Ok,
@@ -35,20 +36,19 @@ export function harvest(creep: Creep): HarvestResult {
                 return HarvestResult.Ok
             }
         } else {
-
+            //查詢當下各個source註冊的creep數量
             const sourceCreeps = new CreepRegisterMap(memory => memory.harvestSourceId)
+            const sourceEdgeMap = sourceEdgeMaps.get(creep.room.name)
+            const sources = Array.from(sourceEdgeMap)
+                .filter(([sourceId, limit]) => sourceCreeps.get(sourceId).length < limit)
+                .map(([sourceId]) => Game.getObjectById<Source>(sourceId)!)
+                .filter(source => source.energy > 0)
 
-            const sourceData = _.map(creep.room.memory.sources, (sourceMemory, sourceId) => ({
-                creepLimit: sourceMemory.creepLimit,
-                sourceId: sourceId!
-            })).find(
-                source =>
-                    sourceCreeps.get(source.sourceId).length < source.creepLimit &&
-                    (Game.getObjectById<Source>(source.sourceId)?.energy ?? 0) > 0
-            )
-            if (sourceData) {
-                creep.memory.harvestSourceId = sourceData.sourceId
-                continue
+            if (sources) {
+                const closetSource = creep.pos.findClosestByRange(sources)!
+                creep.memory.harvestSourceId = closetSource.id
+                harvestSource(creep, closetSource)
+                return HarvestResult.Ok
             } else {
                 return HarvestResult.NoSource
             }
