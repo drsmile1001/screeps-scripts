@@ -1,4 +1,4 @@
-import { findMyStructureNeedEnergy } from "Room/RoomService"
+import { findStructuresNotHostileAndNeedEnergy } from "Room/RoomService"
 import { runAtLoop } from "utils/GameTick"
 import { logger } from "utils/Logger"
 
@@ -39,12 +39,11 @@ export function transferEnergyToMyStructures(creep: Creep): TransferEnergyResult
                 return TransferEnergyResult.Ok
             }
         } else {
-            const structures = findMyStructureNeedEnergy(creep.room)
-            if (structures.length) {
-                creep.memory.transferEnergyTargetId = structures[0].id
-                transferEnergy(creep, structures[0])
-                return TransferEnergyResult.Ok
-            } else return TransferEnergyResult.NoTarget
+            const structures = findStructuresNotHostileAndNeedEnergy(creep.room)
+            if (!structures.length) return TransferEnergyResult.NoTarget
+            const target = creep.pos.findClosestByRange(structures)!
+            transferEnergy(creep, target)
+            return TransferEnergyResult.Ok
         }
     }
 }

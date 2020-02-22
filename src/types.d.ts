@@ -28,7 +28,6 @@ interface HostileCreepMemory {
 declare namespace NodeJS {
     interface Global {
         removeFlags: any
-        testPath: any
         test: any
     }
 }
