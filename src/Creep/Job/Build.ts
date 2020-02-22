@@ -1,4 +1,5 @@
 import { runAtLoop } from "utils/GameTick"
+import { logger } from "utils/Logger"
 
 export enum BuildResult {
     Ok,
@@ -18,7 +19,7 @@ function buildConstructionSite(creep: Creep, target: ConstructionSite) {
             return
         default:
             creep.say("❌")
-            console.log(`${creep.name} 在buildConstructionSite時錯誤 ${result}`)
+            logger.error(`${creep.name} 在buildConstructionSite時錯誤 ${result}`)
             return
     }
 }

@@ -1,4 +1,5 @@
 import { runAtLoop } from "utils/GameTick"
+import { logger } from "utils/Logger"
 
 export enum UpgradeControllerResult {
     Ok,
@@ -18,7 +19,7 @@ export function upgradeController(creep: Creep): UpgradeControllerResult {
             break
         default:
             creep.say("❌")
-            console.log(`${creep.name} 在upgradeController時錯誤 ${result}`)
+            logger.error(`${creep.name} 在upgradeController時錯誤 ${result}`)
             break
     }
     return UpgradeControllerResult.Ok

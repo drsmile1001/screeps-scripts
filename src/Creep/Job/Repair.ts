@@ -2,6 +2,7 @@ import { runAtLoop } from "utils/GameTick"
 import { Cache } from "utils/Cache"
 import { Lazy } from "utils/Lazy"
 import { LazyMap } from "utils/LazyMap"
+import { logger } from "utils/Logger"
 
 export enum RepairResult {
     Ok,
@@ -21,7 +22,7 @@ function repairStructure(creep: Creep, target: Structure) {
             return
         default:
             creep.say("❌")
-            console.log(`${creep.name} 在repairStructure時錯誤 ${result}`)
+            logger.error(`${creep.name} 在repairStructure時錯誤 ${result}`)
             return
     }
 }

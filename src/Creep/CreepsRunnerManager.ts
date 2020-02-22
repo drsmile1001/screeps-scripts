@@ -17,7 +17,7 @@ function runCreep(creep: Creep) {
     const role = creep.memory.role
     const roleRunner = roleRunnerMap.get(creep.memory.role)
     if (roleRunner) roleRunner.run(creep)
-    else logger.warn(`找不到${role}對應執行器`)
+    else logger.warn(`找不到${creep.name}的${role}對應執行器`)
 }
 
 /**執行所有Creep */

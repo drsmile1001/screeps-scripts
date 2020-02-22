@@ -1,6 +1,7 @@
 import { runAtLoop } from "utils/GameTick"
 import { CreepRegisterMap } from "utils/RegisterMap"
 import { sourceEdgeMaps } from "Room/RoomService"
+import { logger } from "utils/Logger"
 
 export enum HarvestResult {
     Ok,
@@ -18,7 +19,7 @@ function harvestSource(creep: Creep, source: Source) {
             return
         default:
             creep.say("❌")
-            console.log(`${creep.name} 在harvestSource時錯誤 ${result}`)
+            logger.error(`${creep.name} 在harvestSource時錯誤 ${result}`)
             return
     }
 }

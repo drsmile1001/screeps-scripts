@@ -1,5 +1,6 @@
 import { findMyStructureNeedEnergy } from "Room/RoomService"
 import { runAtLoop } from "utils/GameTick"
+import { logger } from "utils/Logger"
 
 export enum TransferEnergyResult {
     Ok,
@@ -18,7 +19,7 @@ function transferEnergy(creep: Creep, target: AnyCreep | Structure) {
             return
         default:
             creep.say("❌")
-            console.log(`${creep.name} transferEnergy時錯誤 ${result}`)
+            logger.error(`${creep.name} transferEnergy時錯誤 ${result}`)
             return
     }
 }
