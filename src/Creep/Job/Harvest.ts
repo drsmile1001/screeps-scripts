@@ -44,8 +44,7 @@ export function harvest(creep: Creep): HarvestResult {
                 .filter(([sourceId, limit]) => sourceCreeps.get(sourceId).length < limit)
                 .map(([sourceId]) => Game.getObjectById<Source>(sourceId)!)
                 .filter(source => source.energy > 0)
-
-            if (sources) {
+            if (sources.length) {
                 const closetSource = creep.pos.findClosestByRange(sources)!
                 creep.memory.harvestSourceId = closetSource.id
                 harvestSource(creep, closetSource)

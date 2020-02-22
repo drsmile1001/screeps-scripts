@@ -1,8 +1,6 @@
 global.removeFlags = function(room: string) {
     if (!room) {
         room = "W5N8"
-        // console.log("需要房間名稱")
-        // return
     }
     _.forEach(Game.flags, flag => {
         if (!flag.room) return

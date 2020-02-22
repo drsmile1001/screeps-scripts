@@ -75,23 +75,20 @@ const roomStatus = new LazyMap<string, Cache<RoomCreepStatus>>(
         })
 )
 
-function gerRoomCreepLimit(room: Room): number {
+function gerRoomCreepLimit(roomName: string): number {
     return 9
 }
 
 function runSpawn(spawn: StructureSpawn) {
     if (spawn.spawning !== null) return
-    const status = roomStatus.get(spawn.room.name).value
-    const roomLimit = gerRoomCreepLimit(spawn.room)
-    const hasHostile = hostileRoomObjects.get(spawn.room.name).value.length > 0
+    const room = spawn.room
+    const status = roomStatus.get(room.name).value
+    const roomLimit = gerRoomCreepLimit(room.name)
+    const hasHostile = hostileRoomObjects.get(room.name).value.length > 0
     const energyLimit =
-        spawn.room.energyAvailable +
-        (spawn.room.energyCapacityAvailable - spawn.room.energyAvailable) * (status.creeps / roomLimit)
-    if (
-        (hasHostile && status.roles(Role.RoomGuard) < 5) ||
-        (status.creeps > 6 && status.roles(Role.RoomGuard) < 3)
-    ) {
-        const bodyParts = buildBodyParts(energyLimit, [ATTACK, MOVE, MOVE, TOUGH], [[ATTACK, MOVE, MOVE, TOUGH]])
+        room.energyAvailable + (room.energyCapacityAvailable - room.energyAvailable) * (status.creeps / roomLimit)
+    if ((hasHostile && status.roles(Role.RoomGuard) < 5) || (status.creeps > 6 && status.roles(Role.RoomGuard) < 3)) {
+        const bodyParts = buildBodyParts(energyLimit, [ATTACK, MOVE, MOVE, TOUGH], [[MOVE, ATTACK, MOVE, TOUGH]])
         if (!bodyParts) return
         tryToSpawn(spawn, bodyParts, {
             homeRoom: spawn.room.name,
