@@ -1,5 +1,5 @@
 import { Role } from "Creep/Role"
-import { hostileRoomObjects } from "Room/RoomService"
+import { hostileRoomObjects, roomStructures } from "Room/RoomService"
 import { Cache } from "utils/Cache"
 import { LazyMap } from "utils/LazyMap"
 
@@ -87,33 +87,48 @@ function runSpawn(spawn: StructureSpawn) {
     const hasHostile = hostileRoomObjects.get(room.name).value.length > 0
     const energyLimit =
         room.energyAvailable + (room.energyCapacityAvailable - room.energyAvailable) * (status.creeps / roomLimit)
-    if ((hasHostile && status.roles(Role.RoomGuard) < 5) || (status.creeps > 6 && status.roles(Role.RoomGuard) < 3)) {
-        const bodyParts = buildBodyParts(energyLimit, [ATTACK, MOVE, MOVE, TOUGH], [[MOVE, ATTACK, MOVE, TOUGH]])
-        if (!bodyParts) return
-        tryToSpawn(spawn, bodyParts, {
-            homeRoom: spawn.room.name,
-            role: Role.RoomGuard
-        })
+    if (hasHostile && status.roles(Role.RoomGuard) < 5) {
+        spawnRoomGuard(spawn, energyLimit)
         return
     }
     if (status.creeps >= roomLimit) return
-    if (status.roles(Role.Harvester) > 0 && status.roles(Role.Upgrader) === 0) {
-        const bodyParts = buildBodyParts(
-            energyLimit,
-            [CARRY, MOVE, WORK],
-            [
-                [MOVE, WORK, WORK],
-                [MOVE, WORK, CARRY]
-            ]
-        )
-        if (!bodyParts) return
-        tryToSpawn(spawn, bodyParts, {
-            homeRoom: spawn.room.name,
-            role: Role.Upgrader
-        })
+    if (status.creeps === 0) {
+        spawnHarvester(spawn, energyLimit)
         return
     }
+    if (status.roles(Role.Upgrader) === 0) {
+        spawnUpgrader(spawn, energyLimit)
+        return
+    }
+    const containerCount = roomStructures.get(room.name).value.filter(s => s.structureType === STRUCTURE_CONTAINER)
+        .length
+    if (status.roles(Role.SourceMiner) < containerCount) {
+        spawnEnergyMiner(spawn, energyLimit)
+        return
+    }
+    if (containerCount === 0 && status.roles(Role.Harvester) < 2) {
+        spawnHarvester(spawn, energyLimit)
+        return
+    }
+    if (status.roles(Role.RoomGuard) < 2) {
+        spawnRoomGuard(spawn, energyLimit)
+        return
+    }
+}
 
+function tryToSpawn(spawn: StructureSpawn, bodyParts: BodyPartConstant[], memory: CreepMemory): void {
+    const name = createCreepName(spawn)
+    const trySpawn = spawn.spawnCreep(bodyParts, name, { memory: memory, dryRun: true })
+    if (trySpawn == OK) spawn.spawnCreep(bodyParts, name, { memory: memory })
+}
+
+function createCreepName(spawn: StructureSpawn) {
+    const sn = (spawn.room.memory.creepNumber || 0) + 1
+    spawn.room.memory.creepNumber = sn
+    return `${spawn.room.name}-${sn}`
+}
+
+function spawnHarvester(spawn: StructureSpawn, energyLimit: number) {
     const bodyParts = buildBodyParts(
         energyLimit,
         [MOVE, CARRY, WORK],
@@ -129,14 +144,47 @@ function runSpawn(spawn: StructureSpawn) {
     })
 }
 
-function tryToSpawn(spawn: StructureSpawn, bodyParts: BodyPartConstant[], memory: CreepMemory): void {
-    const name = createCreepName(spawn)
-    const trySpawn = spawn.spawnCreep(bodyParts, name, { memory: memory, dryRun: true })
-    if (trySpawn == OK) spawn.spawnCreep(bodyParts, name, { memory: memory })
+function spawnUpgrader(spawn: StructureSpawn, energyLimit: number) {
+    const bodyParts = buildBodyParts(
+        energyLimit,
+        [CARRY, MOVE, WORK],
+        [
+            [MOVE, WORK, WORK],
+            [MOVE, WORK, CARRY]
+        ]
+    )
+    if (!bodyParts) return
+    tryToSpawn(spawn, bodyParts, {
+        homeRoom: spawn.room.name,
+        role: Role.Upgrader
+    })
 }
 
-function createCreepName(spawn: StructureSpawn) {
-    const sn = (spawn.room.memory.creepNumber || 0) + 1
-    spawn.room.memory.creepNumber = sn
-    return `${spawn.room.name}-${sn}`
+function spawnRoomGuard(spawn: StructureSpawn, energyLimit: number) {
+    const bodyParts = buildBodyParts(energyLimit, [ATTACK, MOVE, MOVE, TOUGH], [[MOVE, ATTACK, MOVE, TOUGH]])
+    if (!bodyParts) return
+    tryToSpawn(spawn, bodyParts, {
+        homeRoom: spawn.room.name,
+        role: Role.RoomGuard
+    })
+}
+
+function spawnEnergyMiner(spawn: StructureSpawn, energyLimit: number) {
+    const tiers = [
+        [CARRY, MOVE, WORK], //200
+        [CARRY, MOVE, WORK, WORK], //300
+        [CARRY, MOVE, WORK, WORK, WORK], // 400
+        [CARRY, MOVE, WORK, WORK, WORK, WORK], //500
+        [CARRY, MOVE, WORK, WORK, WORK, WORK, WORK] //600
+    ]
+    let tierIndex = -1
+    for (let index = 0; index < tiers.length; index++) {
+        if (partsEnergy(tiers[index]) <= energyLimit) tierIndex = index
+        else break
+    }
+    if (tierIndex < 0) return
+    tryToSpawn(spawn, tiers[tierIndex].reverse(), {
+        homeRoom: spawn.room.name,
+        role: Role.SourceMiner
+    })
 }

@@ -7,22 +7,15 @@ interface CreepMemory {
     harvestSourceId?: string
     buildTargetId?: string
     repairTargetId?: string
+    pickEnergyTargetId?: string
+    storeEnergyContainerId?: string
 }
 /** 可用索引取得T */
 interface ILookup<T> {
     [key: string]: T
 }
 interface RoomMemory {
-    hostileCreeps: ILookup<HostileCreepMemory>
     creepNumber: number
-}
-
-interface HostileCreepMemory {
-    body: BodyPartDefinition[]
-    hits: number
-    hitsMax: number
-    x: number
-    y: number
 }
 
 declare namespace NodeJS {
