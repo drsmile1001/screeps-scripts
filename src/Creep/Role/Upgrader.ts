@@ -3,8 +3,11 @@ import { Role } from "Creep/Role"
 import { harvest, HarvestResult } from "Creep/Job/Harvest"
 import { logger } from "utils/Logger"
 import { upgradeController, UpgradeControllerResult } from "Creep/Job/UpgradeController"
+import { roomStructures } from "Room/RoomService"
+import { withdrawEnergy, WithdrawEnergyResult } from "Creep/Job/WithdrawEnergy"
 
 enum Job {
+    WithdrawEnergy = "withdrawEnergy",
     harvest = "harvest",
     upgradeController = "upgradeController"
 }
@@ -15,6 +18,22 @@ export class Upgrader implements IRoleRuner {
     run(creep: Creep) {
         do {
             switch (creep.memory.job) {
+                case Job.WithdrawEnergy:
+                    const withdrawEnergyResult = withdrawEnergy(creep)
+                    switch (withdrawEnergyResult) {
+                        case WithdrawEnergyResult.Ok:
+                            return
+                        case WithdrawEnergyResult.FullEnergy:
+                            delete creep.memory.withdrawEnergyTargetId
+                            creep.memory.job = Job.upgradeController
+                            continue
+                        case WithdrawEnergyResult.NoWithdrawTarget:
+                            creep.memory.job = Job.harvest
+                            continue
+                        default:
+                            logger.error(`未知的withdrawEnergyResult ${withdrawEnergyResult}`)
+                            return
+                    }
                 case Job.harvest:
                     const harvestResult = harvest(creep)
                     switch (harvestResult) {
@@ -37,8 +56,7 @@ export class Upgrader implements IRoleRuner {
                         case UpgradeControllerResult.Ok:
                             return
                         case UpgradeControllerResult.NoEnergy:
-                            //缺乏能源轉移到採集任務
-                            creep.memory.job = Job.harvest
+                            creep.memory.job = Job.WithdrawEnergy
                             continue
                         case UpgradeControllerResult.NoTarget:
                             logger.error(`creep${creep.name} 無有效目標`)

@@ -60,13 +60,7 @@ export class SourceMiner implements IRoleRuner {
                             logger.error(`creep ${creep.name} 找不到可用的container`)
                             return
                         }
-                        const containersInRange = creep.pos.findInRange(containers, 1)
-                        if (!containersInRange.length) {
-                            creep.say("❌")
-                            logger.error(`creep ${creep.name} 找不到在範圍內可用的container`)
-                            return
-                        }
-                        const targetContainer = containersInRange[0]
+                        const targetContainer = creep.pos.findClosestByPath(containers)!
                         creep.memory.storeEnergyContainerId = targetContainer.id
                         this.storeEnergy(creep, targetContainer)
                         return

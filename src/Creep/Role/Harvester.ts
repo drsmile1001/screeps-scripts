@@ -5,8 +5,10 @@ import { logger } from "utils/Logger"
 import { harvest, HarvestResult } from "Creep/Job/Harvest"
 import { build, BuildResult } from "Creep/Job/Build"
 import { repair, RepairResult } from "Creep/Job/Repair"
+import { withdrawEnergy, WithdrawEnergyResult } from "Creep/Job/WithdrawEnergy"
 
 enum Job {
+    WithdrawEnergy = "withdrawEnergy",
     Harvest = "harvest",
     TransferEnergy = "transferEnergy",
     Repair = "repair",
@@ -19,6 +21,22 @@ export class Harvester implements IRoleRuner {
     run(creep: Creep) {
         do {
             switch (creep.memory.job) {
+                case Job.WithdrawEnergy:
+                    const withdrawEnergyResult = withdrawEnergy(creep)
+                    switch (withdrawEnergyResult) {
+                        case WithdrawEnergyResult.Ok:
+                            return
+                        case WithdrawEnergyResult.FullEnergy:
+                            delete creep.memory.withdrawEnergyTargetId
+                            creep.memory.job = Job.Build
+                            continue
+                        case WithdrawEnergyResult.NoWithdrawTarget:
+                            creep.memory.job = Job.Harvest
+                            continue
+                        default:
+                            logger.error(`未知的withdrawEnergyResult ${withdrawEnergyResult}`)
+                            return
+                    }
                 case Job.Harvest:
                     const harvestResult = harvest(creep)
                     switch (harvestResult) {
@@ -43,7 +61,7 @@ export class Harvester implements IRoleRuner {
                         case TransferEnergyResult.NoEnergy:
                             //缺乏能源轉移到採集任務
                             delete creep.memory.transferEnergyTargetId
-                            creep.memory.job = Job.Harvest
+                            creep.memory.job = Job.WithdrawEnergy
                             continue
                         case TransferEnergyResult.NoTarget:
                             //沒有能源轉移對象，改去維修
@@ -94,7 +112,7 @@ export class Harvester implements IRoleRuner {
                             return
                     }
                 default:
-                    creep.memory.job = Job.TransferEnergy
+                    creep.memory.job = Job.WithdrawEnergy
                     continue
             }
         } while (true)

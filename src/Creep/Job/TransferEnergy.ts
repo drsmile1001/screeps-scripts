@@ -40,6 +40,7 @@ export function transferEnergyToMyStructures(creep: Creep): TransferEnergyResult
             }
         } else {
             const structures = findStructuresNotHostileAndNeedEnergy(creep.room)
+                .filter(s => s.structureType !== STRUCTURE_CONTAINER)
             if (!structures.length) return TransferEnergyResult.NoTarget
             const target = creep.pos.findClosestByRange(structures)!
             transferEnergy(creep, target)

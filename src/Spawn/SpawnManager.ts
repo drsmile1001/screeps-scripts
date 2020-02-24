@@ -86,7 +86,7 @@ function runSpawn(spawn: StructureSpawn) {
     const roomLimit = gerRoomCreepLimit(room.name)
     const hasHostile = hostileRoomObjects.get(room.name).value.length > 0
     const energyLimit =
-        room.energyAvailable + (room.energyCapacityAvailable - room.energyAvailable) * (status.creeps / roomLimit)
+        room.energyAvailable //+ (room.energyCapacityAvailable - room.energyAvailable) * (status.creeps / roomLimit)
     if (hasHostile && status.roles(Role.RoomGuard) < 5) {
         spawnRoomGuard(spawn, energyLimit)
         return
@@ -106,7 +106,7 @@ function runSpawn(spawn: StructureSpawn) {
         spawnEnergyMiner(spawn, energyLimit)
         return
     }
-    if (containerCount === 0 && status.roles(Role.Harvester) < 2) {
+    if (containerCount === 0 || status.roles(Role.Harvester) < 2) {
         spawnHarvester(spawn, energyLimit)
         return
     }
@@ -114,6 +114,8 @@ function runSpawn(spawn: StructureSpawn) {
         spawnRoomGuard(spawn, energyLimit)
         return
     }
+    spawnHarvester(spawn, energyLimit)
+    return
 }
 
 function tryToSpawn(spawn: StructureSpawn, bodyParts: BodyPartConstant[], memory: CreepMemory): void {

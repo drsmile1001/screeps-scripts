@@ -9,6 +9,7 @@ interface CreepMemory {
     repairTargetId?: string
     pickEnergyTargetId?: string
     storeEnergyContainerId?: string
+    withdrawEnergyTargetId?: string
 }
 /** 可用索引取得T */
 interface ILookup<T> {
