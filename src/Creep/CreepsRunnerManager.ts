@@ -4,10 +4,11 @@ import { logger } from "utils/Logger"
 import { Upgrader } from "./Role/Upgrader"
 import { Role } from "Creep/Role"
 import { RoomGuard } from "./Role/RoomGuard"
+import { SourceMiner } from "./Role/SourceMiner"
 
 /**註冊的執行器 */
 const roleRunnerMap = new Map<Role, IRoleRuner>()
-const roleRunners: IRoleRuner[] = [new Harvester(), new Upgrader(), new RoomGuard()]
+const roleRunners: IRoleRuner[] = [new Harvester(), new Upgrader(), new RoomGuard(), new SourceMiner()]
 roleRunners.forEach(roleRunner => {
     roleRunnerMap.set(roleRunner.role, roleRunner)
 })
@@ -17,7 +18,7 @@ function runCreep(creep: Creep) {
     const role = creep.memory.role
     const roleRunner = roleRunnerMap.get(creep.memory.role)
     if (roleRunner) roleRunner.run(creep)
-    else logger.warn(`找不到${creep.name}的${role}對應執行器`)
+    else logger.error(`找不到${creep.name}的${role}對應執行器`)
 }
 
 /**執行所有Creep */

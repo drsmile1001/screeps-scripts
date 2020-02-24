@@ -33,7 +33,7 @@ export class SourceMiner implements IRoleRuner {
                                         .get(source.id)
                                         .find(creepId => Game.creeps[creepId].memory.role === Role.SourceMiner)
                             )
-                        if (sources.length) {
+                        if (!sources.length) {
                             creep.say("❌")
                             logger.error(`creep ${creep.name} 找不到可用的source`)
                             return
@@ -45,7 +45,7 @@ export class SourceMiner implements IRoleRuner {
                     }
                     const source = Game.getObjectById<Source>(creep.memory.harvestSourceId)!
                     this.harvestSource(creep, source)
-                    break
+                    return
                 case Job.Store:
                     if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
                         creep.memory.job = Job.Mine

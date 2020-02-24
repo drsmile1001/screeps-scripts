@@ -5,5 +5,8 @@ export enum Role {
     Upgrader = "upgrader",
     /**房間守衛 */
     RoomGuard = "roomGuard",
-    Repairer = "repairer"
+    /**維修工 */
+    Repairer = "repairer",
+    /**能源礦工 */
+    SourceMiner = "sourceMiner"
 }
