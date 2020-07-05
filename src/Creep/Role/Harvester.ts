@@ -28,7 +28,7 @@ export class Harvester implements IRoleRuner {
                             return
                         case WithdrawEnergyResult.FullEnergy:
                             delete creep.memory.withdrawEnergyTargetId
-                            creep.memory.job = Job.Build
+                            creep.memory.job = Job.TransferEnergy
                             continue
                         case WithdrawEnergyResult.NoWithdrawTarget:
                             creep.memory.job = Job.Harvest
@@ -78,7 +78,7 @@ export class Harvester implements IRoleRuner {
                             return
                         case RepairResult.NoEnergy:
                             //缺乏能源轉移到採集任務
-                            creep.memory.job = Job.Harvest
+                            creep.memory.job = Job.WithdrawEnergy
                             continue
                         case RepairResult.Done:
                             //維修一次後，改去傳送能源
@@ -99,7 +99,7 @@ export class Harvester implements IRoleRuner {
                             return
                         case BuildResult.NoEnergy:
                             //缺乏能源轉移到採集任務
-                            creep.memory.job = Job.Harvest
+                            creep.memory.job = Job.WithdrawEnergy
                             continue
                         case BuildResult.Done:
                             creep.memory.job = Job.TransferEnergy

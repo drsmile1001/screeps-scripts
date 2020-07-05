@@ -11,7 +11,7 @@ function withdrawEnergyTarget(creep: Creep, target: StructureContainer) {
     const result = creep.withdraw(target, RESOURCE_ENERGY)
     switch (result) {
         case ERR_NOT_IN_RANGE:
-            runAtLoop(3, () => creep.say("⛏️"), creep.ticksToLive)
+            runAtLoop(3, () => creep.say("🛒"), creep.ticksToLive)
             creep.moveTo(target, { visualizePathStyle: { stroke: "#ffaa00" } })
             return
         case OK:
@@ -36,9 +36,11 @@ export function withdrawEnergy(creep: Creep): WithdrawEnergyResult {
                 return WithdrawEnergyResult.Ok
             }
         } else {
-            const containers = roomStructures.get(creep.room.name).value
-                .filter(s => s.structureType === STRUCTURE_CONTAINER &&
-                    s.store.getUsedCapacity(RESOURCE_ENERGY) > 0) as StructureContainer[]
+            const containers = roomStructures
+                .get(creep.room.name)
+                .value.filter(
+                    s => s.structureType === STRUCTURE_CONTAINER && s.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+                ) as StructureContainer[]
             if (!containers.length) {
                 return WithdrawEnergyResult.NoWithdrawTarget
             }

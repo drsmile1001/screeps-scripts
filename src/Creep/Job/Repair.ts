@@ -66,9 +66,9 @@ const passiveDefenseStatuses = new LazyMap<string, Cache<PassiveDefenseStatus>>(
     roomName => new Cache(() => new PassiveDefenseStatus(roomName))
 )
 
-function structureNeedRepair(structure: AnyStructure): boolean {
+function structureNeedRepair(structure: AnyStructure, percentLimit: number): boolean {
     if (
-        structure.hits >= structure.hitsMax * 0.8 &&
+        structure.hits >= structure.hitsMax * percentLimit &&
         structure.structureType !== STRUCTURE_RAMPART &&
         structure.structureType !== STRUCTURE_WALL
     )
@@ -91,7 +91,7 @@ export function repair(creep: Creep, once: boolean = false): RepairResult {
     while (true) {
         if (creep.memory.repairTargetId) {
             const structure = Game.getObjectById<AnyOwnedStructure>(creep.memory.repairTargetId)
-            if (!structure || !structureNeedRepair(structure)) {
+            if (!structure || !structureNeedRepair(structure, 0.95)) {
                 delete creep.memory.repairTargetId
                 if (once) return RepairResult.Done
                 else continue
@@ -101,7 +101,7 @@ export function repair(creep: Creep, once: boolean = false): RepairResult {
             }
         } else {
             const structures = creep.room.find(FIND_STRUCTURES, {
-                filter: structure => structureNeedRepair(structure)
+                filter: structure => structureNeedRepair(structure, 0.85)
             })
             if (!structures.length) return RepairResult.NoTarget
             let targets = structures.filter(
